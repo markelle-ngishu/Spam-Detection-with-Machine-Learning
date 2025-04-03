@@ -1,6 +1,7 @@
 # Import required libraries
 import pandas as pd
 import numpy as np
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, StackingClassifier, BaggingClassifier
 from sklearn.preprocessing import StandardScaler
@@ -161,4 +162,19 @@ stacked_model.fit(X_train, y_train)
 
 # Step 12: Evaluate the model's performance
 print("\nEvaluating Model Performance")
+
 predictions = stacked_model.predict(X_test)
+accuracy = accuracy_score(y_test, predictions)
+precision = precision_score(y_test, predictions)
+recall = recall_score(y_test, predictions)
+f1 = f1_score(y_test, predictions)
+
+# Display results
+print("\nOptimized Stacking Model with Bagging and Early Stopping Performance:")
+print(f"Accuracy: {accuracy}")
+print(f"Precision: {precision}")
+print(f"Recall: {recall}")
+print(f"F1 Score: {f1}")
+print(f"Best Hyperparameters (RandomForest): {grid_search.best_params_}")
+print(f"Best Hyperparameters (Gradient Boosting): {gb_random_search.best_params_}")
+print(f"Selected Features: {selected_features}")
