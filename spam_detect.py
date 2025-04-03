@@ -1,5 +1,12 @@
 # Import required libraries
 import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import SelectFromModel
+from sklearn.ensemble import IsolationForest
+
 
 # Load the dataset from the CSV file
 try:
@@ -34,3 +41,25 @@ target_variable = 'class'
 # Extract features and target variable
 X = dataset[selected_features]
 y = dataset[target_variable]
+# DATA PREPROCESSING
+
+# Step 2: Handle missing values
+imputer = SimpleImputer(strategy='mean')  # Use mean imputation for missing values
+X_imputed = imputer.fit_transform(X)
+X_imputed = pd.DataFrame(X_imputed, columns=selected_features)
+
+# Step 3: Detect and handle outliers
+outlier_detector = IsolationForest(contamination=0.05, random_state=42)
+outliers = outlier_detector.fit_predict(X_imputed)
+X_no_outliers = X_imputed[outliers != -1]
+y_no_outliers = y[outliers != -1]
+
+# Step 4: Normalize the features
+scaler = StandardScaler()
+X_normalized = scaler.fit_transform(X_no_outliers)
+X_normalized = pd.DataFrame(X_normalized, columns=selected_features)
+
+# Step 5: Feature selection using RandomForest importance
+feature_selector = SelectFromModel(RandomForestClassifier(n_estimators=100, random_state=42))
+X_selected = feature_selector.fit_transform(X_normalized, y_no_outliers)
+selected_features = np.array(selected_features)[feature_selector.get_support()]
